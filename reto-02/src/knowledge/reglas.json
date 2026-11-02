@@ -1,0 +1,36 @@
+{
+  "umbral_confianza": 0.8,
+  "umbral_similitud_objeto": 0.9,
+  "fecha_corte_maestro": "2026-05-30",
+  "dias_alerta_vencimiento": 60,
+  "max_caracteres_objeto": 200,
+  "monedas": ["COP", "USD", "PEN", "PAB", "HNL"],
+  "paises": ["CO", "EC", "PE", "PA", "HN"],
+  "pais_por_lugar": {
+    "colombia": "CO", "bogota": "CO", "medellin": "CO", "barranquilla": "CO", "cali": "CO", "cartagena": "CO",
+    "ecuador": "EC", "quito": "EC", "guayaquil": "EC",
+    "peru": "PE", "lima": "PE",
+    "panama": "PA",
+    "honduras": "HN", "tegucigalpa": "HN", "san pedro sula": "HN"
+  },
+  "pais_por_identificador": { "NIT": "CO", "RTN": "HN" },
+  "longitud_ruc": { "13": "EC", "11": "PE" },
+  "tipos_poliza": {
+    "cumplimiento": "cumplimiento",
+    "calidad": "calidad",
+    "responsabilidad civil": "responsabilidad_civil",
+    "salarios y prestaciones": "salarios_prestaciones",
+    "pago de salarios": "salarios_prestaciones",
+    "estabilidad": "estabilidad",
+    "buen manejo del anticipo": "anticipo",
+    "anticipo": "anticipo"
+  },
+  "documentos_contrato": ["contrato", "contrato marco", "otrosi", "adicion", "acta de terminacion"],
+  "documentos_no_contrato": ["cotizacion", "propuesta", "oferta", "factura", "orden de compra"],
+  "sufijos_societarios": ["s.a.s.", "s.a.c.", "s.a.", "s. de r.l.", "s.r.l.", "ltda.", "e.u.", "s.c.a."],
+  "campos_obligatorios_nuevo": ["id_contrato", "cliente", "nit_cliente", "pais", "objeto", "valor", "moneda", "fecha_inicio", "fecha_fin", "requiere_poliza"],
+  "confirmacion": {
+    "afirmativas": ["si", "confirmo", "confirmado", "confirma", "registra", "registralo", "registrar", "adelante", "procede", "dale", "ok", "okay", "de acuerdo", "hazlo", "autorizo", "apruebo", "aprobado", "correcto"],
+    "negativas": ["no", "todavia no", "aun no", "cancela", "cancelar", "espera", "detente", "no registres"]
+  }
+}
