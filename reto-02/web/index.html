@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registro de Contratos</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="barra">
+      <div>
+        <h1>Registro de Contratos Vigentes</h1>
+        <p class="sub">Punto único de recepción · Periferia IT Group</p>
+      </div>
+      <div class="acciones">
+        <span id="proveedor" class="chip" title="Proveedor y modelo de lenguaje">conectando…</span>
+        <button id="nueva" type="button" class="secundario">Nueva sesión</button>
+      </div>
+    </header>
+
+    <main id="principal">
+      <section class="bienvenida" id="bienvenida">
+        <p>Pídeme que procese el buzón de contratos. Leo cada correo, extraigo los datos del contrato con su nivel de confianza, detecto duplicados y actualizaciones, registro en el maestro lo que está limpio y te pregunto antes de registrar algo dudoso. Al final genero las alertas de vencimientos y pólizas.</p>
+        <p id="estado-buzon"></p>
+        <div id="casos" class="casos" aria-label="Atajos"></div>
+      </section>
+      <section id="mensajes" class="mensajes" aria-live="polite"></section>
+      <div id="pensando" class="pensando" hidden>
+        <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span id="pensando-texto">El agente está pensando…</span>
+      </div>
+    </main>
+
+    <form id="formulario" class="entrada">
+      <textarea id="texto" rows="2" placeholder="Ej.: Procesa el buzón con fecha de hoy 2026-09-03. No registres nada dudoso sin preguntarme." aria-label="Mensaje"></textarea>
+      <button id="enviar" type="submit">Enviar</button>
+    </form>
+    <footer id="pie" class="pie"></footer>
+
+    <script type="module" src="./app.ts"></script>
+  </body>
+</html>

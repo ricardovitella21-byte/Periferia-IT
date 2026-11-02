@@ -127,7 +127,7 @@ export const leer_buzon = definirHerramienta({
           }),
       )
       return {
-        data: { mensajes, pendientes: mensajes.length, procesados: Object.keys(procesados).length },
+        data: { hoy: fechaReferencia(), mensajes, pendientes: mensajes.length, procesados: Object.keys(procesados).length },
         resumen: `${mensajes.length} pendientes (${mensajes.filter((m) => m.tiene_contrato).length} con contrato) · ${Object.keys(procesados).length} ya procesados`,
       }
     })
@@ -168,6 +168,15 @@ export const validar = definirHerramienta({
   },
 })
 
+type ResultadoRegistro = {
+  id_contrato: string | null
+  accion: "insertado" | "actualizado" | "duplicado" | "rechazado"
+  ruta_archivo: string | null
+  motivo?: string | null
+  campos_confirmados?: string[]
+  cambios?: Record<string, { antes: string; despues: string }>
+}
+
 export const registrar = definirHerramienta({
   description:
     "Registra el contrato validado: inserta o actualiza la fila del maestro en out/sharepoint, archiva el documento en Contratos/<año>/<cliente>/, agrega el historial y marca el mensaje como procesado; si hay campos en revisión exige confirmado=true.",
@@ -177,7 +186,7 @@ export const registrar = definirHerramienta({
     confirmado: z.boolean().optional().describe("true solo si la analista confirmó explícitamente los campos en revisión en su último mensaje"),
   },
   async execute(args, ctx) {
-    return ejecutar("contratos_registrar", ctx, args.mensaje_id, async () => {
+    return ejecutar<ResultadoRegistro>("contratos_registrar", ctx, args.mensaje_id, async () => {
       const procesados = await leerProcesados(ctx)
       const previo = procesados[args.mensaje_id]
       if (previo) throw new ErrorHerramienta(`El mensaje ${args.mensaje_id} ya fue procesado (${previo.clasificacion}, ${previo.accion}).`)

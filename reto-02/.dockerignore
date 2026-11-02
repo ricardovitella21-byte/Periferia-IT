@@ -1,0 +1,9 @@
+node_modules
+out
+.env
+tests
+modulo
+scripts
+README.md
+SOLUCION.md
+PRD.md
