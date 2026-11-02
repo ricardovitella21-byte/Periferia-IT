@@ -4,7 +4,7 @@ Agente conversacional que lee una solicitud de registro como proveedor, llena el
 
 - Enunciado: [`PRD.md`](PRD.md)
 - Planteamiento de la solución: [`SOLUCION.md`](SOLUCION.md)
-- **Link de prueba:** _pendiente de despliegue_
+- **Link de prueba:** <https://periferia-reto-01-proveedor-zsrc.onrender.com> (público, sin clave de acceso; si lleva 15 minutos sin uso tarda alrededor de un minuto en despertar)
 
 ## Requisitos
 

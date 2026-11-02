@@ -4,7 +4,7 @@ Agente conversacional que lee el paquete de cada solicitud de compra (solicitud,
 
 - Enunciado: [`PRD.md`](PRD.md)
 - Planteamiento de la solución, diseño del adaptador SAP real y lectura del proceso: [`SOLUCION.md`](SOLUCION.md)
-- **Link de prueba:** _pendiente de despliegue_
+- **Link de prueba:** <https://periferia-reto-03-ordenes-compra-hkje.onrender.com> (público, sin clave de acceso; si lleva 15 minutos sin uso tarda alrededor de un minuto en despertar)
 
 ## Requisitos
 

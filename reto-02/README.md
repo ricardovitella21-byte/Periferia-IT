@@ -4,7 +4,7 @@ Agente conversacional que actúa como **punto único de recepción** de contrato
 
 - Enunciado: [`PRD.md`](PRD.md)
 - Planteamiento de la solución y **regla de gobierno**: [`SOLUCION.md`](SOLUCION.md)
-- **Link de prueba:** _pendiente de despliegue_
+- **Link de prueba:** <https://periferia-reto-02-contratos-kn54.onrender.com> (público, sin clave de acceso; si lleva 15 minutos sin uso tarda alrededor de un minuto en despertar)
 
 ## Requisitos
 
