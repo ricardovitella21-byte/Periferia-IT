@@ -59,12 +59,11 @@ Implementado a mano en `src/agent/ciclo.ts` (sin el tool runner del SDK), porque
 - **Proveedor y modelo:** Anthropic, `claude-sonnet-5-5`, con esfuerzo `medium` (configurable con `LLM_MODEL` y `LLM_EFFORT`).
 - **Por qué:** el trabajo del modelo aquí es orquestar 5–6 herramientas en orden, respetar reglas (no inventar, pedir confirmación) y redactar un resumen en español. No hay razonamiento profundo: los valores y las reglas los calculan las herramientas. Sonnet 5.5 es fuerte en uso de herramientas en varios pasos, cuesta la mitad que Opus 5.5 ($2 / $10 por millón de tokens de entrada / salida, frente a $4 / $20) y responde más rápido. `medium` es el punto de partida recomendado para tareas de varias herramientas.
 - **Detalles de integración:** razonamiento adaptativo por defecto; los bloques de razonamiento se devuelven intactos en cada turno (el adaptador guarda el contenido nativo). Caché de prompt automática (`cache_control`) porque el prompt de sistema y las herramientas no cambian. Fallback del servidor (`fallbacks: "default"`) para que un rechazo por política se reintente en otro modelo. Timeout de 90 s y 2 reintentos del SDK.
-- **Costo estimado por caso procesado** (estimación, aún no medida con tráfico real):
-  - Un caso completo son unas 6 llamadas al modelo: leer, mapear, generar, armar, confirmar y el resumen final.
-  - Cada llamada lleva unos 4.000 tokens fijos (prompt de sistema y herramientas) más el historial, que crece con los resultados.
-  - Total: unos 50.000 tokens de entrada y entre 3.000 y 6.000 de salida, incluido el razonamiento.
-  - Sin caché: 50k × $2/M + 5k × $10/M ≈ **US$0,15 por caso**. Con la caché de prefijo (la mayor parte de la entrada se repite de una llamada a la siguiente), queda en **US$0,05–0,10**.
-  - El chat muestra los tokens acumulados de la sesión para medirlo en la práctica.
+- **Costo por caso procesado** (medido el 2026-11-02 en el link desplegado, con el prompt de la sección 11 del PRD):
+  - `ec-corp-andina`: el turno de procesamiento hizo 5 llamadas al modelo (leer, mapear, generar, armar y pedir confirmación), con 40.721 tokens de entrada y 1.731 de salida. El "envía" que confirma sumó 21.869 y 325.
+  - Total del caso: 62.590 tokens de entrada y 2.056 de salida. A precio completo son 62,6k × $2/M + 2,1k × $10/M ≈ **US$0,15 como máximo**. La parte de la entrada que se lee de la caché de prefijo cuesta menos, así que el costo real es menor.
+  - La estimación previa (unos 50.000 tokens de entrada, US$0,05–0,15 por caso) quedó confirmada.
+  - El chat muestra los tokens acumulados de la sesión para seguir midiéndolo.
   - Con 8–12 solicitudes al mes, el costo mensual es de centavos a un par de dólares.
 
 ## 5. Diseño del formato "portal web con usuario y contraseña"
@@ -135,9 +134,9 @@ Implementado a mano en `src/agent/ciclo.ts` (sin el tool runner del SDK), porque
 | HU-4 Envío simulado con confirmación | Hecho | `ENVIO-SIMULADO.md` solo tras confirmación verificada por el servidor (pruebas). | Envío real desde el buzón corporativo, con un humano que aprueba. |
 | HU-5 Manejo de errores | Hecho | Caso inexistente (lista los disponibles), plantilla dañada (continúa con soportes), formato desconocido, argumentos inválidos, errores del modelo; ninguna herramienta lanza. | Alertas operativas (monitoreo) y reintentos con cola. |
 | Bonus `modulo/` | Hecho | `agent.md`, `skill/registro-proveedor/SKILL.md` y `tools/proveedor.ts` se generan desde las mismas fuentes; una prueba falla si divergen. | Publicarlo en el registro de agentes interno. |
-| Link público | Pendiente | `Dockerfile` listo. | Desplegar y definir `ACCESS_KEY`. |
+| Link público | Hecho | <https://periferia-reto-01-proveedor-zsrc.onrender.com> en Render, probado con Claude Sonnet 5.5 y el prompt de la sección 11. | Servicio siempre encendido y autenticación corporativa. |
 
-Verificación: `bun run demo.ts` (sin clave), `bun test` (31 pruebas), `bun run typecheck` (sin `any`).
+Verificación: `bun run demo.ts` (sin clave), `bun test` (31 pruebas), `bun run typecheck` (sin `any`) y el flujo de la sección 11 con el modelo real en el link (sección 4).
 
 ## 9. Uso de IA
 
@@ -154,6 +153,7 @@ Verificación: `bun run demo.ts` (sin clave), `bun test` (31 pruebas), `bun run 
   - **Confiar en el prompt para la confirmación:** se agregó la verificación en el servidor.
   - **Similitud con umbral 0,5 para proponer campos:** "Referencias comerciales" acababa propuesto como "Contacto comercial". Se subió a 0,6 y se bloqueó la similitud hacia datos bancarios.
   - **Un framework de front (React):** innecesario para este chat.
+- **Ajuste tras probar con el modelo real:** con el prompt de la sección 11, el primer turno cerraba sin pregunta y el envío necesitaba tres mensajes. Se ajustó el prompt para cerrar siempre con la pregunta de confirmación del envío (preguntar no es enviar). Ahora "envía" produce `ENVIO-SIMULADO.md` en el segundo mensaje, como describe el PRD.
 
 ## 10. Riesgos de llevar esto a producción y mitigación
 
@@ -163,7 +163,7 @@ Verificación: `bun run demo.ts` (sin clave), `bun test` (31 pruebas), `bun run 
 | Envío sin autorización. | Confirmación verificada por el servidor; el envío real seguirá siendo un paso humano. |
 | Maestro o soportes desactualizados (un dato correcto en el maestro pero viejo en la realidad). | Dueño del dato con revisión periódica; alertas de vigencia (por ejemplo, Cámara de Comercio a 30 días). |
 | Plantillas reales peores que los fixtures (celdas combinadas, PDFs escaneados, etiquetas nuevas). | Estados "por confirmar" y "faltante" en vez de adivinar; ampliar el glosario con aprobación; leer el adjunto original. |
-| Exposición de datos sensibles (cuenta bancaria, identificación del representante). | Nunca en el borrador de correo; la API exige `ACCESS_KEY` en despliegue; descargas confinadas a `out/`; en producción, autenticación corporativa (Entra ID) y cifrado en reposo. |
-| Costo descontrolado si el link es público. | Topes de iteraciones, de tokens por sesión y de tokens diarios; clave de acceso; mensajes de hasta 4.000 caracteres. |
+| Exposición de datos sensibles (cuenta bancaria, identificación del representante). | Nunca en el borrador de correo; la API admite `ACCESS_KEY` (en esta entrega el link es abierto, como permite el PRD, y los datos son ficticios); descargas confinadas a `out/`; en producción, autenticación corporativa (Entra ID) y cifrado en reposo. |
+| Costo descontrolado si el link es público. | Topes de iteraciones, de tokens por sesión y de tokens diarios (2.000.000 en el despliegue); límite de gasto configurable en la consola de Anthropic; `ACCESS_KEY` disponible; mensajes de hasta 4.000 caracteres. |
 | Caída o lentitud del proveedor del modelo. | Timeout y reintentos; mensaje claro y sesión viva; el modo sin modelo y `demo.ts` siguen funcionando; el adaptador permite cambiar de proveedor. |
 | Sesiones en archivos locales y un solo proceso. | Para varias instancias, mover sesiones y `out/` a almacenamiento compartido (Blob, SharePoint) y agregar un candado distribuido por sesión. |

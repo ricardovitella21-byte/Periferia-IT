@@ -47,10 +47,10 @@ Es el mismo diseño de los retos 01 y 02 (`src/agent/ciclo.ts`):
 
 - **Proveedor y modelo:** Anthropic, `claude-sonnet-5-5`, esfuerzo `medium` (configurable).
 - **Por qué:** el modelo orquesta unas 6 herramientas en orden, respeta "no la crees hasta que confirme" y presenta la OC en una tabla clara. Los controles, el payload y la evidencia son deterministas, así que no se necesita razonamiento profundo. Sonnet 5.5 es fuerte en uso de herramientas en varios pasos y cuesta la mitad que Opus 5.5 ($2 / $10 por millón de tokens). La integración incluye razonamiento adaptativo con bloques devueltos intactos, caché del prompt, fallback del servidor (`fallbacks: "default"`), timeout y reintentos.
-- **Costo estimado por solicitud procesada** (estimación, aún no medida con tráfico real):
-  - Una solicitud son unas 6 llamadas al modelo.
-  - Cada llamada lleva unos 4.500 tokens fijos (prompt de sistema y herramientas) más el historial: el paquete pesa unos 1.500 tokens y el payload unos 800.
-  - Total: unos 45.000 tokens de entrada y 4.000 de salida. Sin caché: 45k × $2/M + 4k × $10/M ≈ **US$0,13 por OC**. Con la caché de prefijo, **US$0,05–0,08**.
+- **Costo por solicitud procesada** (medido el 2026-11-02 en el link desplegado, con el prompt de la sección 11 del PRD):
+  - `sol-004`: el turno de revisión hizo 5 llamadas al modelo (leer, validar, construir, evidencia y pedir confirmación), con 39.063 tokens de entrada y 1.195 de salida. El "confirmo" que crea la OC sumó 19.948 y 860.
+  - Total: 59.011 tokens de entrada y 2.055 de salida. A precio completo son 59k × $2/M + 2,1k × $10/M ≈ **US$0,14 por OC como máximo**. La parte de la entrada que se lee de la caché de prefijo cuesta menos, así que el costo real es menor.
+  - La estimación previa era de unos 45.000 tokens de entrada (US$0,13 sin caché); la confirmación en un segundo turno agrega el resto.
   - Frente al tiempo de digitación y de corrección en el cierre, el costo es marginal.
 
 ## 5. Matriz de controles
@@ -185,9 +185,9 @@ En el caso de prueba (sol-005), la factura es del 10 de agosto, la solicitud del
 | HU-6 Errores | Hecho | Paquete incompleto, JSON malformado, monto no numérico, caso inexistente: mensaje legible con qué pedir al solicitante. | Respuesta automática al solicitante con lo que falta. |
 | P1 leer Excel | Hecho | `oc_leer_excel` (prueba con un `.xlsx` generado). | — |
 | Bonus `modulo/` | Hecho | Generado desde las mismas fuentes; una prueba verifica que no diverja. | — |
-| Link público | Pendiente | `Dockerfile` listo. | Desplegar. |
+| Link público | Hecho | <https://periferia-reto-03-ordenes-compra-hkje.onrender.com> en Render, probado con Claude Sonnet 5.5 y el prompt de la sección 11. | Servicio siempre encendido y autenticación corporativa. |
 
-Verificación: `bun run demo.ts` (sin clave), `bun test` (32 pruebas), `bun run typecheck` (sin `any`).
+Verificación: `bun run demo.ts` (sin clave), `bun test` (32 pruebas), `bun run typecheck` (sin `any`) y el flujo de la sección 11 con el modelo real en el link (sección 4).
 
 ## 11. Uso de IA
 
@@ -203,6 +203,7 @@ Verificación: `bun run demo.ts` (sin clave), `bun test` (32 pruebas), `bun run 
   - **Construir la OC con el total de la cotización:** excedía lo aprobado en sol-004.
   - **Exigir el payload en `oc_crear` siempre:** impedía registrar los intentos bloqueados en el control.
   - **Hash del archivo PDF como evidencia:** no es reproducible.
+- **Ajuste tras probar con el modelo real:** con el prompt de la sección 11, al crear la OC el modelo afirmó que `confirmado_por` seguía en null, porque `oc_crear` no le devolvía las excepciones. Ahora las devuelve con quién confirmó, igual que lo guardado en el SAP simulado.
 
 ## 12. Riesgos de llevar esto a producción y mitigación
 
@@ -214,5 +215,5 @@ Verificación: `bun run demo.ts` (sin clave), `bun test` (32 pruebas), `bun run 
 | Correos de aprobación falsificados o reenviados. | Verificar el remitente con los encabezados del correo (DKIM/SPF) y que la aprobación responda al hilo de la solicitud; a mediano plazo, aprobación en un flujo con firma (Power Automate o SAP Flexible Workflow). |
 | OC duplicadas por reintentos. | Idempotencia por `solicitud_id` consultando SAP antes de crear; nunca reintentar sin consultar. |
 | Credenciales de SAP expuestas. | Usuario técnico con rol mínimo, OAuth o certificado, Key Vault, rotación, y nunca en el prompt ni en los logs. |
-| Costo o abuso del link público. | Topes de iteraciones y de tokens por sesión y diarios, clave de acceso, mensajes acotados. |
+| Costo o abuso del link público. | Topes de iteraciones y de tokens por sesión y diarios (2.000.000 en el despliegue), límite de gasto configurable en la consola de Anthropic, `ACCESS_KEY` disponible (en esta entrega el link es abierto, como permite el PRD) y mensajes acotados. |
 | La retroactividad se normaliza en vez de corregirse. | Indicador mensual a la dirección y la política "sin OC no hay pago" (sección 7). |

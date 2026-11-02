@@ -49,10 +49,10 @@ Es el mismo diseño del reto 01, implementado a mano en `src/agent/ciclo.ts`:
 
 - **Proveedor y modelo:** Anthropic, `claude-sonnet-5-5`, esfuerzo `medium` (configurable).
 - **Por qué:** el modelo orquesta unas 20 llamadas a herramientas por lote, respeta reglas de no registrar lo dudoso y redacta un resumen claro en español. La extracción y la clasificación son deterministas, así que el modelo no necesita razonamiento profundo. Sonnet 5.5 es fuerte en uso de herramientas en varios pasos y cuesta la mitad que Opus 5.5 ($2 / $10 por millón de tokens de entrada / salida). La integración incluye razonamiento adaptativo con los bloques devueltos intactos, caché del prompt (`cache_control`), fallback del servidor (`fallbacks: "default"`), timeout de 90 s y reintentos.
-- **Costo estimado** (estimación, aún no medida con tráfico real):
-  - Un lote de 6 mensajes son de 8 a 20 llamadas al modelo, según cuántas herramientas pida en paralelo.
-  - Cada llamada lleva unos 4.500 tokens fijos (prompt de sistema y herramientas) más un historial que crece, porque cada extracción devuelve entre 1.000 y 1.500 tokens.
-  - Total del lote: unos 200.000 tokens de entrada y 8.000 de salida. Sin caché: 200k × $2/M + 8k × $10/M ≈ **US$0,48 por lote**, unos US$0,08 por contrato. Con la caché de prefijo (la mayor parte de la entrada se repite), queda en **US$0,15–0,25 por lote**.
+- **Costo** (medido el 2026-11-02 en el link desplegado, con el prompt de la sección 11 del PRD):
+  - El lote de 6 mensajes hizo 6 llamadas al modelo, que pidió las 20 herramientas en paralelo por grupos, con 81.419 tokens de entrada y 5.239 de salida. La confirmación de msg-006 sumó 43.892 y 1.479.
+  - Total: 125.311 tokens de entrada y 6.718 de salida. A precio completo son 125k × $2/M + 6,7k × $10/M ≈ **US$0,32 como máximo**, unos US$0,05 por mensaje. La parte de la entrada que se lee de la caché de prefijo cuesta menos, así que el costo real es menor.
+  - Quedó por debajo de la estimación previa (unos 200.000 tokens de entrada, hasta US$0,48 por lote) gracias a las llamadas en paralelo.
   - Con un volumen típico de decenas de contratos al mes, el costo mensual es de pocos dólares. El chat muestra los tokens de la sesión para medirlo.
 
 ## 5. Estrategia de extracción
@@ -154,9 +154,9 @@ La extracción es **determinista** (`src/tools/lib/extraccion.ts`): expresiones 
 | P1 leer PDF | Hecho | `contratos_leer_pdf` y adjuntos `.pdf` con texto nativo (prueba con un PDF generado). | OCR para escaneados. |
 | Regla de gobierno | Hecho | Sección 6. | Aprobación por la dirección. |
 | Bonus `modulo/` | Hecho | Generado desde las mismas fuentes; una prueba verifica que no diverja. | — |
-| Link público | Pendiente | `Dockerfile` listo. | Desplegar. |
+| Link público | Hecho | <https://periferia-reto-02-contratos-kn54.onrender.com> en Render, probado con Claude Sonnet 5.5 y el prompt de la sección 11. | Servicio siempre encendido y autenticación corporativa. |
 
-Verificación: `bun run demo.ts` (sin clave), `bun test` (28 pruebas), `bun run typecheck` (sin `any`).
+Verificación: `bun run demo.ts` (sin clave), `bun test` (28 pruebas), `bun run typecheck` (sin `any`) y el flujo de la sección 11 con el modelo real en el link (sección 4).
 
 ## 10. Uso de IA
 
@@ -171,6 +171,7 @@ Verificación: `bun run demo.ts` (sin clave), `bun test` (28 pruebas), `bun run 
   - **Comparar todos los campos para detectar duplicados:** habría convertido el reenvío de msg-004 en una actualización falsa.
   - **Registrar el `contrato` tal como lo manda el modelo:** se cambió por re-extraer y validar dentro de `registrar`.
   - **Resolver la fecha de firma sin día con el primer día del mes:** se prefirió la fecha del correo con confianza baja y revisión humana.
+- **Prueba con el modelo real:** el flujo de la sección 11 (lote completo y "confirmo el valor 0 y la fecha fin 2027-08-31") dio el resultado esperado sin ajustes.
 
 ## 11. Riesgos de llevar esto a producción y mitigación
 
@@ -181,6 +182,6 @@ Verificación: `bun run demo.ts` (sin clave), `bun test` (28 pruebas), `bun run 
 | Falsos duplicados o falsas actualizaciones por variaciones de nombre. | Duplicado por número, valor y fechas; actualización por número o por NIT + objeto con similitud ≥ 0,9; las diferencias quedan en el historial con antes y después. |
 | Comerciales que no envían los contratos (el problema de fondo). | Regla de gobierno con control en facturación e indicador de cobertura mensual. |
 | Concurrencia sobre el maestro (dos lotes a la vez). | Ejecución en serie por turno; en producción, lista de SharePoint con control de versiones y bloqueo optimista. |
-| Datos confidenciales de contratos en el modelo. | En el flujo normal solo se envían al modelo los datos extraídos, no el texto del contrato (solo `contratos_leer_pdf` devuelve texto completo, y se usa a pedido); proveedor con retención limitada; acceso a la app con autenticación corporativa (Entra ID) y `ACCESS_KEY` en el link. |
-| Costo o abuso del link público. | Topes de iteraciones y de tokens por sesión y por día, clave de acceso y mensajes de hasta 4.000 caracteres. |
+| Datos confidenciales de contratos en el modelo. | En el flujo normal solo se envían al modelo los datos extraídos, no el texto del contrato (solo `contratos_leer_pdf` devuelve texto completo, y se usa a pedido); proveedor con retención limitada; acceso a la app con autenticación corporativa (Entra ID). La API admite `ACCESS_KEY`; en esta entrega el link es abierto, como permite el PRD, porque los datos son ficticios. |
+| Costo o abuso del link público. | Topes de iteraciones y de tokens por sesión y por día (2.000.000 en el despliegue), límite de gasto configurable en la consola de Anthropic, `ACCESS_KEY` disponible y mensajes de hasta 4.000 caracteres. |
 | Dependencia de una persona otra vez. | Proceso documentado (regla de gobierno y conocimiento en `src/knowledge`), agente reutilizable (`modulo/`), alertas automáticas y dueño del maestro definido. |
