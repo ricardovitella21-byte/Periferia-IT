@@ -3,7 +3,7 @@ import { join } from "node:path"
 import { z } from "zod"
 import { ejecutar } from "./lib/ejecucion.ts"
 import { fechaReferencia, esFechaIso, hoyIso } from "./lib/fechas.ts"
-import { cargarCaso, cargarGlosario, cargarIndiceSoportes, cargarMaestro, type CasoCargado } from "./lib/fixtures.ts"
+import { cargarCaso, cargarGlosario, cargarIndiceSoportes, cargarMaestro, listarCasos, type CasoCargado } from "./lib/fixtures.ts"
 import { escribirPdf, escribirValoresPortal, escribirXlsx, resolverCampos, type CampoResuelto, type Encabezado } from "./lib/formularios.ts"
 import { identificadoresPorConfirmar, mapearCampos, type ResultadoMapeo } from "./lib/mapeo.ts"
 import { borradorCorreoMd, bloqueosDeFirma, checklistMd, evaluarSoportes } from "./lib/paquete.ts"
@@ -63,6 +63,26 @@ async function formularioExistente(ctx: ContextoHerramienta, nombre: string): Pr
   }
   return null
 }
+
+export const listar_casos = definirHerramienta({
+  description: "Lista los casos de registro como proveedor disponibles en la carpeta de entrada, con cliente, país y formato pedido.",
+  args: {},
+  async execute(_args, ctx) {
+    return ejecutar("proveedor_listar_casos", ctx, null, async () => {
+      const casos = await Promise.all(
+        (await listarCasos(ctx)).map(async (nombre) => {
+          try {
+            const { solicitud } = await cargarCaso(ctx, nombre)
+            return { caso: nombre, cliente: solicitud.cliente, pais: solicitud.pais, formato: solicitud.formato, fecha: solicitud.fecha }
+          } catch (e) {
+            return { caso: nombre, error: e instanceof Error ? e.message : String(e) }
+          }
+        }),
+      )
+      return { data: { casos }, resumen: `${casos.length} casos` }
+    })
+  },
+})
 
 export const leer_solicitud = definirHerramienta({
   description:

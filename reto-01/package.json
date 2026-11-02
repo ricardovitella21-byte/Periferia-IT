@@ -6,6 +6,7 @@
   "description": "Agente conversacional que automatiza el registro de Periferia como proveedor ante clientes",
   "scripts": {
     "dev": "bun --hot src/server.ts",
+    "dev:sin-modelo": "LLM_PROVIDER=guion bun --hot src/server.ts",
     "start": "bun src/server.ts",
     "demo": "bun run demo.ts",
     "test": "bun test",

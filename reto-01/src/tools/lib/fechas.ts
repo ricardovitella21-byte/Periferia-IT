@@ -6,9 +6,10 @@ export function esFechaIso(valor: string): boolean {
   return !Number.isNaN(fecha.getTime()) && fecha.toISOString().slice(0, 10) === valor
 }
 
-/** Fecha de hoy (UTC) en formato YYYY-MM-DD. */
+/** Fecha de hoy en la zona horaria del negocio (Medellín por defecto), formato YYYY-MM-DD. */
 export function hoyIso(): string {
-  return new Date().toISOString().slice(0, 10)
+  const zona = process.env.ZONA_HORARIA || "America/Bogota"
+  return new Intl.DateTimeFormat("en-CA", { timeZone: zona, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date())
 }
 
 /**

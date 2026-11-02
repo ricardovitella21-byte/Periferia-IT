@@ -4,7 +4,7 @@
  *
  *   bun install && bun run demo.ts
  */
-import { cp, mkdtemp, rm, writeFile } from "node:fs/promises"
+import { copyFile, mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import * as proveedor from "./src/tools/proveedor.ts"
@@ -17,6 +17,15 @@ const ctx: ContextoHerramienta = { directory: import.meta.dir, sessionId: "demo"
 
 type Respuesta = { ok: true; data: Record<string, unknown> } | { ok: false; error: string }
 const parse = (s: string) => JSON.parse(s) as Respuesta
+
+async function copiarDirectorio(origen: string, destino: string): Promise<void> {
+  await mkdir(destino, { recursive: true })
+  for (const entrada of await readdir(origen, { withFileTypes: true })) {
+    const [o, d] = [join(origen, entrada.name), join(destino, entrada.name)]
+    if (entrada.isDirectory()) await copiarDirectorio(o, d)
+    else await copyFile(o, d)
+  }
+}
 const lista = (v: unknown) => (Array.isArray(v) && v.length ? v.map((x) => (typeof x === "string" ? x : (x as { etiqueta: string }).etiqueta)).join(", ") : "ninguno")
 
 async function procesar(caso: string, c: ContextoHerramienta = ctx): Promise<void> {
@@ -68,7 +77,7 @@ async function main() {
   // Copia temporal de los fixtures con una plantilla dañada (los fixtures originales no se tocan).
   const temporal = await mkdtemp(join(tmpdir(), "reto01-demo-"))
   try {
-    await cp(join(ctx.directory, "fixtures"), join(temporal, "fixtures"), { recursive: true })
+    await copiarDirectorio(join(ctx.directory, "fixtures"), join(temporal, "fixtures"))
     await writeFile(join(temporal, "fixtures/reto-01/casos/co-industrias-delta/plantilla-celdas.json"), "{ esto no es json", "utf8")
     await procesar("co-industrias-delta", { directory: temporal, sessionId: "demo-errores" })
   } finally {
