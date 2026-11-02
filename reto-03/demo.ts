@@ -40,7 +40,7 @@ async function procesar(caso: string, c: ContextoHerramienta = ctx, confirmado =
   for (const k of v.confirmaciones) console.log(`     ❓ ${k.codigo}: ${k.detalle}`)
   for (const [campo, d] of Object.entries(v.derivados)) console.log(`     ↳ derivado ${campo} = ${d.valor} (${d.fuente})`)
   if (!v.apta) {
-    const intento = parse(await oc.crear.execute({ caso, payload: {} as OrdenCompra }, c))
+    const intento = parse(await oc.crear.execute({ caso }, c))
     console.log(`     OC: no creada (${intento.ok ? "?" : "bloqueada"})`)
     return null
   }

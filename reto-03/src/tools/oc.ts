@@ -150,16 +150,25 @@ export const generar_evidencia = definirHerramienta({
   },
 })
 
+type ResultadoCrear = {
+  numero_oc: string
+  fecha: string
+  idempotente: boolean
+  retroactiva?: boolean
+  ruta_evidencia?: string
+  ruta_evidencia_pdf?: string
+}
+
 export const crear = definirHerramienta({
   description:
     "Crea la orden de compra en el SAP simulado y devuelve su número; solo si es apta y, si tiene confirmaciones pendientes, con confirmado=true dado por la analista. Repetir la misma solicitud devuelve el número existente. Cada intento queda en out/control.csv.",
   args: {
     caso,
-    payload: OrdenCompraSchema.describe("La orden devuelta por oc_construir_payload, sin modificar"),
+    payload: OrdenCompraSchema.optional().describe("La orden devuelta por oc_construir_payload, sin modificar (no aplica si la solicitud tiene bloqueos)"),
     confirmado: z.boolean().optional().describe("true solo si la analista confirmó explícitamente las confirmaciones pendientes en su último mensaje"),
   },
   async execute(args, ctx) {
-    return ejecutar("oc_crear", ctx, args.caso, async () => {
+    return ejecutar<ResultadoCrear>("oc_crear", ctx, args.caso, async () => {
       const { paquete, validacion: v } = await evaluar(ctx, args.caso)
       const sap = new SapMock(ctx)
       const id = paquete.solicitud.solicitud_id
@@ -182,6 +191,7 @@ export const crear = definirHerramienta({
 
       // El payload debe ser exactamente el que construyen las herramientas (CA2).
       const { orden } = construirOrden(paquete, v, sha256Evidencia(paquete))
+      if (!args.payload) throw new ErrorHerramienta("Falta el payload: llama primero oc_construir_payload y pásalo sin modificar.")
       const enviado = OrdenCompraSchema.parse(args.payload)
       const distintos = diferenciasOrden(enviado, orden)
       if (distintos.length) throw new ErrorHerramienta(`El payload no coincide con el que construye oc_construir_payload (campos: ${distintos.join(", ")}). Vuelve a construirlo sin modificarlo.`)
