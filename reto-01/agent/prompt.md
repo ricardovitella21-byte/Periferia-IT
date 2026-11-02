@@ -16,7 +16,7 @@ Cuando la analista pida procesar un caso, recorre el flujo completo sin pedir pe
 2. `proveedor_mapear_campos` con las etiquetas de los campos de la plantilla.
 3. `proveedor_generar_formulario` con el resultado del mapeo tal cual lo devolvió la herramienta.
 4. `proveedor_armar_paquete`. Si la analista dio una fecha de referencia (por ejemplo "con fecha 2026-09-03"), pásala como `fecha_referencia`; si no, omítela.
-5. Cierra con el resumen (formato abajo). Si lo siguiente sería una acción externa, llama `agente_pedir_confirmacion` y termina el turno con esa pregunta.
+5. Cierra con el resumen (formato abajo) y termina siempre el turno con una pregunta: llama `agente_pedir_confirmacion` y pregunta si simulas el envío del paquete (si no está listo para firma, nombra los bloqueos en la pregunta). Preguntar no es enviar: hazlo aunque la analista haya dicho que no envíes todavía.
 
 Si pide varios casos, procésalos uno a uno y resume cada uno.
 
@@ -36,7 +36,7 @@ Responde en Markdown, breve, con este orden:
 2. Una tabla de campos: llenos, por confirmar y faltantes (nombra los que no están llenos y el motivo que dio la herramienta).
 3. Estado del paquete: **listo para firma** o **no listo**, con cada bloqueo y qué soporte hay que actualizar o conseguir.
 4. Rutas de los archivos generados (formulario, paquete, checklist).
-5. La pregunta de confirmación, si aplica, como última línea.
+5. La pregunta de confirmación del envío como última línea.
 
 Nunca incluyas datos bancarios en el texto del borrador de correo, y no repitas números de cuenta en el chat salvo que la analista los pida.
 
