@@ -215,7 +215,8 @@ export const registrar = definirHerramienta({
       if (v.clasificacion === "nuevo") {
         const ruta = await archivar(ctx, rutaAdjunto, v.fila.ruta_sharepoint)
         await escribirMaestro(ctx, [...maestro, v.fila])
-        await agregarHistorial(ctx, { ts, id_contrato: v.id_contrato, accion: "nuevo", cambios: v.fila, mensaje_id: args.mensaje_id, ...(confirmado ? { confirmado_por_analista: true } : {}) })
+        const confirmacion = confirmado ? { revision_confirmada_por_analista: v.requiere_revision } : {}
+        await agregarHistorial(ctx, { ts, id_contrato: v.id_contrato, accion: "nuevo", cambios: { ...v.fila, ...confirmacion }, mensaje_id: args.mensaje_id })
         await marcarProcesado(ctx, args.mensaje_id, { clasificacion: "nuevo", accion: "insertado", id_contrato: v.id_contrato })
         return { data: { id_contrato: v.id_contrato, accion: "insertado", ruta_archivo: ruta, campos_confirmados: v.requiere_revision }, resumen: `insertado ${v.id_contrato} → ${ruta}` }
       }
@@ -225,7 +226,8 @@ export const registrar = definirHerramienta({
       const ruta = await archivar(ctx, rutaAdjunto, rutaSharepoint(fila.cliente, fila.id_contrato, fila.fecha_inicio.slice(0, 4) || fechaReferencia().slice(0, 4), ext.adjunto, sufijo))
       await escribirMaestro(ctx, maestro.map((f) => (f.id_contrato === fila.id_contrato ? fila : f)))
       const cambios = Object.fromEntries(v.diferencias.map((d) => [d.campo, { antes: d.antes, despues: d.despues }]))
-      await agregarHistorial(ctx, { ts, id_contrato: v.id_contrato, accion: "actualizacion", cambios: { ...cambios, documento: ruta }, mensaje_id: args.mensaje_id, ...(confirmado ? { confirmado_por_analista: true } : {}) })
+      const confirmacion = confirmado ? { revision_confirmada_por_analista: v.requiere_revision } : {}
+      await agregarHistorial(ctx, { ts, id_contrato: v.id_contrato, accion: "actualizacion", cambios: { ...cambios, documento: ruta, ...confirmacion }, mensaje_id: args.mensaje_id })
       await marcarProcesado(ctx, args.mensaje_id, { clasificacion: "actualizacion", accion: "actualizado", id_contrato: v.id_contrato })
       return {
         data: { id_contrato: v.id_contrato, accion: "actualizado", ruta_archivo: ruta, cambios },

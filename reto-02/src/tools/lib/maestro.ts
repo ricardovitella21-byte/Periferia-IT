@@ -62,7 +62,6 @@ export type EntradaHistorial = {
   accion: string
   cambios: Record<string, unknown>
   mensaje_id: string
-  confirmado_por_analista?: boolean
 }
 
 export async function agregarHistorial(ctx: ContextoHerramienta, entrada: EntradaHistorial): Promise<void> {
