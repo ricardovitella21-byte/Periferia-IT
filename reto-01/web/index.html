@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registro como Proveedor</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="barra">
+      <div>
+        <h1>Registro como Proveedor</h1>
+        <p class="sub">Agente administrativo · Periferia IT Group</p>
+      </div>
+      <div class="acciones">
+        <span id="proveedor" class="chip" title="Proveedor y modelo de lenguaje">conectando…</span>
+        <button id="nueva" type="button" class="secundario">Nueva sesión</button>
+      </div>
+    </header>
+
+    <main id="principal">
+      <section class="bienvenida" id="bienvenida">
+        <p>Pídeme que procese una solicitud de registro. Leo el correo y la plantilla, lleno el formulario con el repositorio maestro, armo el paquete para firma y te pido confirmación antes de cualquier envío.</p>
+        <div id="casos" class="casos" aria-label="Casos disponibles"></div>
+      </section>
+      <section id="mensajes" class="mensajes" aria-live="polite"></section>
+      <div id="pensando" class="pensando" hidden>
+        <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span id="pensando-texto">El agente está pensando…</span>
+      </div>
+    </main>
+
+    <form id="formulario" class="entrada">
+      <textarea id="texto" rows="2" placeholder='Ej.: Procesa el caso "ec-corp-andina". No envíes nada todavía.' aria-label="Mensaje"></textarea>
+      <button id="enviar" type="submit">Enviar</button>
+    </form>
+    <footer id="pie" class="pie"></footer>
+
+    <script type="module" src="./app.ts"></script>
+  </body>
+</html>

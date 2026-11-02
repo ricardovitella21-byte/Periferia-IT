@@ -4,7 +4,7 @@ Tres retos independientes. Cada carpeta es un proyecto completo (backend, chat w
 
 | Carpeta | Reto | Estado |
 |---|---|---|
-| [`reto-01/`](reto-01/) | Agente "Registro como Proveedor" | En curso |
+| [`reto-01/`](reto-01/) | Agente "Registro como Proveedor" | Completo (falta link público) |
 | [`reto-02/`](reto-02/) | Agente "Registro de Contratos Vigentes" | Pendiente |
 | [`reto-03/`](reto-03/) | Agente "Órdenes de Compra SAP" | Pendiente |
 
