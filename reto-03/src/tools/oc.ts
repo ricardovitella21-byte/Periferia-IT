@@ -9,7 +9,7 @@ import { ejecutar } from "./lib/ejecucion.ts"
 import { contenidoEvidencia, escribirEvidencia, sha256 } from "./lib/evidencia.ts"
 import { cargarMaestros } from "./lib/maestros.ts"
 import { leerPaquete, listarSolicitudes, type Paquete } from "./lib/paquete.ts"
-import { construirOrden, diferenciasOrden, OrdenCompraSchema } from "./lib/payload.ts"
+import { construirOrden, diferenciasOrden, OrdenCompraSchema, type OrdenCompra } from "./lib/payload.ts"
 import { relativa, rutas } from "./lib/rutas.ts"
 import { pesos } from "./lib/texto.ts"
 import { definirHerramienta, ErrorHerramienta, type ContextoHerramienta } from "./lib/tipos.ts"
@@ -157,6 +157,7 @@ type ResultadoCrear = {
   retroactiva?: boolean
   ruta_evidencia?: string
   ruta_evidencia_pdf?: string
+  excepciones?: OrdenCompra["excepciones"]
 }
 
 export const crear = definirHerramienta({
@@ -164,7 +165,7 @@ export const crear = definirHerramienta({
     "Crea la orden de compra en el SAP simulado y devuelve su número; solo si es apta y, si tiene confirmaciones pendientes, con confirmado=true dado por la analista. Repetir la misma solicitud devuelve el número existente. Cada intento queda en out/control.csv.",
   args: {
     caso,
-    payload: OrdenCompraSchema.optional().describe("La orden devuelta por oc_construir_payload, sin modificar (no aplica si la solicitud tiene bloqueos)"),
+    payload: OrdenCompraSchema.optional().describe("La orden devuelta por oc_construir_payload, sin modificar (no aplica si la solicitud tiene bloqueos). oc_crear completa confirmado_por de las excepciones al crearla."),
     confirmado: z.boolean().optional().describe("true solo si la analista confirmó explícitamente las confirmaciones pendientes en su último mensaje"),
   },
   async execute(args, ctx) {
@@ -203,7 +204,7 @@ export const crear = definirHerramienta({
       const { numero_oc, fecha } = await sap.crearOrden(final)
       await registrarIntento(ctx, { ...base, resultado: "creada", numero_oc })
       return {
-        data: { numero_oc, fecha, idempotente: false, retroactiva: v.retroactiva, ruta_evidencia: relativa(ctx, evidencia.txt), ruta_evidencia_pdf: relativa(ctx, evidencia.pdf) },
+        data: { numero_oc, fecha, idempotente: false, retroactiva: v.retroactiva, ruta_evidencia: relativa(ctx, evidencia.txt), ruta_evidencia_pdf: relativa(ctx, evidencia.pdf), excepciones: final.excepciones },
         resumen: `OC ${numero_oc} creada${v.retroactiva ? " (retroactiva)" : ""}`,
       }
     })

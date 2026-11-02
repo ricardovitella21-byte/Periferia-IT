@@ -148,6 +148,9 @@ describe("HU-5 · crear en SAP simulado", () => {
     expect(con.ok && con.data.numero_oc).toBe("4500000002")
     const registro = JSON.parse((await readFile(join(ctx.directory, "out/sap/ordenes.jsonl"), "utf8")).trim().split("\n").at(-1) ?? "{}") as { orden: OrdenCompra }
     expect(registro.orden.excepciones.find((e) => e.codigo === "RC5")?.confirmado_por).toContain("analista")
+    // El resultado le dice al modelo quién confirmó, igual que lo guardado en SAP.
+    const devueltas = con.ok ? (con.data.excepciones as OrdenCompra["excepciones"]) : []
+    expect(devueltas.find((e) => e.codigo === "RC5")?.confirmado_por).toContain("analista")
   })
 
   test("retroactiva queda marcada en control.csv", async () => {

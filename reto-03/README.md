@@ -91,7 +91,7 @@ Cada elemento de `toolCalls` es `{ id, nombre, argumentos, ok, resumen, duracion
 | `oc_validar` | `{ caso, paquete }` | `{ apta, bloqueos[], confirmaciones[], derivados, retroactiva, advertencias }` |
 | `oc_construir_payload` | `{ caso, paquete, derivados }` | `{ orden (OrdenCompra), ruta_trazabilidad }` |
 | `oc_generar_evidencia` | `{ caso }` | `{ ruta, ruta_pdf, sha256 }` |
-| `oc_crear` | `{ caso, payload, confirmado? }` | `{ numero_oc, fecha, idempotente }` o `{ ok: false, error }` |
+| `oc_crear` | `{ caso, payload, confirmado? }` | `{ numero_oc, fecha, idempotente, excepciones }` (con `confirmado_por` completado) o `{ ok: false, error }` |
 | `oc_leer_excel` (P1) | `{ ruta, hoja? }` | `{ filas[] }` |
 | `oc_listar_solicitudes` | `{}` | Solicitudes disponibles |
 
