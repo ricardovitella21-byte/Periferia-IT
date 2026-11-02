@@ -1,0 +1,58 @@
+# Blueprint de Render: un servicio web por reto. Cada servicio usa solo su carpeta
+# (rootDir) y su Dockerfile; un push que no toca la carpeta de un reto no lo redespliega.
+#
+# Crear: Render Dashboard → New → Blueprint → este repositorio (rama main).
+# ANTHROPIC_API_KEY se pide en el panel al crear (sync: false): nunca va en este archivo.
+# El resto de variables usa los valores por defecto del código (ver el README de cada reto).
+services:
+  - type: web
+    name: periferia-reto-01-proveedor
+    runtime: docker
+    plan: free
+    region: virginia
+    branch: main
+    rootDir: reto-01
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      # Link abierto: tope diario más bajo que el del código (5.000.000).
+      - key: MAX_TOKENS_DIA
+        value: "2000000"
+
+  - type: web
+    name: periferia-reto-02-contratos
+    runtime: docker
+    plan: free
+    region: virginia
+    branch: main
+    rootDir: reto-02
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: MAX_TOKENS_DIA
+        value: "2000000"
+
+  - type: web
+    name: periferia-reto-03-ordenes-compra
+    runtime: docker
+    plan: free
+    region: virginia
+    branch: main
+    rootDir: reto-03
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: MAX_TOKENS_DIA
+        value: "2000000"

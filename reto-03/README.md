@@ -135,4 +135,10 @@ fixtures/                      entregados por Periferia (no se modifican)
 
 ## Despliegue
 
-El `Dockerfile` levanta el servidor en el puerto `PORT`. En Render, Railway o Fly.io: crear un servicio con raíz `reto-03/` y definir `ANTHROPIC_API_KEY` (y opcionalmente `ACCESS_KEY`) como variables secretas.
+Desplegado en Render (plan gratis) con el Blueprint [`render.yaml`](../render.yaml) de la raíz del repositorio. Es un servicio web Docker con raíz `reto-03/`, en la región Virginia, con health check en `/api/health`. Cada push a `main` que toque esta carpeta lo redespliega.
+
+- `ANTHROPIC_API_KEY` es una variable secreta del servicio en el panel de Render. Nunca va en el repositorio.
+- El link es público, sin clave de acceso. El gasto lo limitan `MAX_ITERACIONES`, `MAX_TOKENS_SESION` y `MAX_TOKENS_DIA` (2.000.000 en el despliegue). El tope diario vive en memoria y se reinicia cuando el servicio se duerme, así que conviene fijar además un límite de gasto en la consola de Anthropic.
+- En el plan gratis el servicio se duerme tras 15 minutos sin tráfico y tarda alrededor de un minuto en despertar. Al dormirse se borran `out/` (incluidos el SAP simulado y `control.csv`, así que la numeración vuelve a 4500000001) y las sesiones, y el chat abre una sesión nueva solo.
+
+El mismo `Dockerfile` sirve en Railway, Fly.io o Azure: basta definir `ANTHROPIC_API_KEY` como variable secreta.
