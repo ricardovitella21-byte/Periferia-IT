@@ -1,0 +1,32 @@
+{
+  "paises": {
+    "CO": { "nombre": "Colombia", "identificador_tributario": "NIT" },
+    "EC": { "nombre": "Ecuador", "identificador_tributario": "RUC" },
+    "PE": { "nombre": "Perú", "identificador_tributario": "RUC" },
+    "PA": { "nombre": "Panamá", "identificador_tributario": "RUC" },
+    "HN": { "nombre": "Honduras", "identificador_tributario": "RTN" }
+  },
+  "pais_emisor_maestro": "CO",
+  "clave_identificador_tributario": "nit",
+  "claves_bancarias": ["banco.nombre", "banco.tipo_cuenta", "banco.numero_cuenta", "banco.titular", "banco.swift"],
+  "mapeo": {
+    "umbral_lleno": 0.8,
+    "umbral_propuesta": 0.6,
+    "palabras_vacias": ["de", "del", "la", "el", "los", "las", "y", "o", "en", "para", "por", "a", "e", "su", "al"]
+  },
+  "soportes": {
+    "camara_comercio": "Certificado de existencia y representación legal (Cámara de Comercio)",
+    "rut": "Registro Único Tributario (RUT)",
+    "certificacion_bancaria": "Certificación bancaria",
+    "parafiscales": "Certificación de pago de parafiscales y seguridad social",
+    "estados_financieros": "Estados financieros del último año",
+    "certificado_cumplimiento_tributario": "Certificado de cumplimiento tributario",
+    "certificado_iso_9001": "Certificado ISO 9001"
+  },
+  "formatos_soportados": ["xlsx", "pdf"],
+  "formatos_conocidos": ["xlsx", "pdf", "portal"],
+  "confirmacion": {
+    "afirmativas": ["si", "confirmo", "confirmado", "confirma", "envia", "enviar", "envialo", "enviala", "adelante", "procede", "dale", "ok", "okay", "de acuerdo", "hazlo", "autorizo", "apruebo", "aprobado", "correcto"],
+    "negativas": ["no", "todavia no", "aun no", "cancela", "cancelar", "espera", "detente", "no envies"]
+  }
+}
