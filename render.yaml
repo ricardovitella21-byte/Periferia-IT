@@ -1,5 +1,8 @@
 # Blueprint de Render: un servicio web por reto. Cada servicio usa solo su carpeta
-# (rootDir) y su Dockerfile; un push que no toca la carpeta de un reto no lo redespliega.
+# (rootDir) y su Dockerfile.
+#
+# Los servicios están enlazados al repositorio público: Render no redespliega solo con
+# cada push. Para publicar un cambio: Manual Deploy → Deploy latest commit en cada servicio.
 #
 # Crear: Render Dashboard → New → Blueprint → este repositorio (rama main).
 # ANTHROPIC_API_KEY se pide en el panel al crear (sync: false): nunca va en este archivo.

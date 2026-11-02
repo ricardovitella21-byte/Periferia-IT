@@ -118,7 +118,7 @@ out/                                generado en ejecución (no se versiona)
 
 ## Despliegue
 
-Desplegado en Render (plan gratis) con el Blueprint [`render.yaml`](../render.yaml) de la raíz del repositorio. Es un servicio web Docker con raíz `reto-01/`, en la región Virginia, con health check en `/api/health`. Cada push a `main` que toque esta carpeta lo redespliega.
+Desplegado en Render (plan gratis) con el Blueprint [`render.yaml`](../render.yaml) de la raíz del repositorio. Es un servicio web Docker con raíz `reto-01/`, en la región Virginia, con health check en `/api/health`. Para publicar un cambio subido a `main`: en el panel de Render, **Manual Deploy → Deploy latest commit** (el servicio está enlazado al repositorio público, y en ese modo Render no redespliega solo con cada push).
 
 - `ANTHROPIC_API_KEY` es una variable secreta del servicio en el panel de Render. Nunca va en el repositorio.
 - El link es público, sin clave de acceso. El gasto lo limitan `MAX_ITERACIONES`, `MAX_TOKENS_SESION` y `MAX_TOKENS_DIA` (2.000.000 en el despliegue). El tope diario vive en memoria y se reinicia cuando el servicio se duerme, así que conviene fijar además un límite de gasto en la consola de Anthropic.
