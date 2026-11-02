@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Órdenes de Compra SAP</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="barra">
+      <div>
+        <h1>Órdenes de Compra SAP</h1>
+        <p class="sub">Agente administrativo · Periferia IT Group</p>
+      </div>
+      <div class="acciones">
+        <span id="proveedor" class="chip" title="Proveedor y modelo de lenguaje">conectando…</span>
+        <button id="nueva" type="button" class="secundario">Nueva sesión</button>
+      </div>
+    </header>
+
+    <main id="principal">
+      <section class="bienvenida" id="bienvenida">
+        <p>Pídeme que procese una solicitud de compra. Leo el paquete (solicitud, cotización, aprobación y factura), aplico los controles RC1–RC10, te muestro la OC como quedaría en SAP con la evidencia de aprobación y solo la creo cuando todo está en regla o tú lo confirmas.</p>
+        <div id="casos" class="casos" aria-label="Solicitudes disponibles"></div>
+      </section>
+      <section id="mensajes" class="mensajes" aria-live="polite"></section>
+      <div id="pensando" class="pensando" hidden>
+        <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span id="pensando-texto">El agente está pensando…</span>
+      </div>
+    </main>
+
+    <form id="formulario" class="entrada">
+      <textarea id="texto" rows="2" placeholder='Ej.: Procesa la solicitud "sol-004". No la crees hasta que yo lo confirme.' aria-label="Mensaje"></textarea>
+      <button id="enviar" type="submit">Enviar</button>
+    </form>
+    <footer id="pie" class="pie"></footer>
+
+    <script type="module" src="./app.ts"></script>
+  </body>
+</html>
