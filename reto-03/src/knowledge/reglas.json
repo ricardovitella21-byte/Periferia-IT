@@ -1,0 +1,35 @@
+{
+  "sociedad": "1000",
+  "organizacion_compras": "1000",
+  "numero_oc_inicial": 4500000001,
+  "tolerancia_cotizacion": 0.02,
+  "tolerancia_valor_total": 1,
+  "max_descripcion": 40,
+  "paso_posicion": 10,
+  "monedas": ["COP", "USD"],
+  "aprobacion": {
+    "positivas": ["aprobado", "aprobada", "apruebo", "autorizado", "autorizo"],
+    "negativas": ["no aprobado", "no apruebo", "rechazado", "rechazo", "no autorizo", "no autorizado"]
+  },
+  "unidades": {
+    "H": ["hora", "horas"],
+    "MES": ["mensual", "mensualidad", "por mes", "mes a mes"]
+  },
+  "unidad_por_defecto": "UN",
+  "acciones_sugeridas": {
+    "RC1_inexistente": "Solicitar la creación del proveedor en SAP (RUT, Cámara de Comercio y certificación bancaria) o pedir la cotización a un proveedor ya registrado.",
+    "RC1_inactivo": "Pedir a datos maestros que reactive el proveedor en SAP o elegir otro proveedor activo.",
+    "RC2": "Pedir la aprobación a un aprobador autorizado del centro de costo, respondiendo el mismo hilo con la palabra \"Aprobado\".",
+    "RC3": "Escalar la aprobación a un aprobador del centro con tope suficiente o dividir la compra si el negocio lo permite.",
+    "RC4": "Corregir la subárea en la solicitud con una que pertenezca al centro de costo.",
+    "RC5": "Confirmar el valor con el solicitante o pedir una cotización actualizada.",
+    "RC6": "Confirmar el indicador de IVA derivado del proveedor.",
+    "RC8": "Confirmar la creación de una OC retroactiva; queda registrada en el control de auditoría.",
+    "RC9": "Confirmar que la aprobación vale aunque sea anterior a la solicitud, o pedir una nueva.",
+    "RC10": "Pedir al solicitante corregir cantidad, valor unitario o valor total."
+  },
+  "confirmacion": {
+    "afirmativas": ["si", "confirmo", "confirmado", "confirma", "crea", "creala", "crear", "adelante", "procede", "dale", "ok", "okay", "de acuerdo", "hazlo", "autorizo", "apruebo", "aprobado", "correcto"],
+    "negativas": ["no", "todavia no", "aun no", "cancela", "cancelar", "espera", "detente", "no la crees", "no crees"]
+  }
+}
